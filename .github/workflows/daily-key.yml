@@ -2,18 +2,20 @@ name: Daily Key Generator
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # tiap hari jam 00:00 UTC
-  workflow_dispatch:     # bisa run manual
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   generate-key:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Generate random key
+      - name: Generate key
         run: |
           KEY="MUNCAK-$(openssl rand -hex 4 | tr 'a-f' 'A-F')"
           echo "$KEY" > key
@@ -23,5 +25,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add key
-          git commit -m "🔑 Daily key update"
-          git push
+          git commit -m "Daily key update" || echo "No changes"
+          git push origin HEAD
